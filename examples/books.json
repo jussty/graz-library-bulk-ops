@@ -1,0 +1,16 @@
+{
+  "queries": [
+    {
+      "query": "Harry Potter",
+      "search_type": "title"
+    },
+    {
+      "query": "J.K. Rowling",
+      "search_type": "author"
+    },
+    {
+      "query": "9780439708180",
+      "search_type": "isbn"
+    }
+  ]
+}
