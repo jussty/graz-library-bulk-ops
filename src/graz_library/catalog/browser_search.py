@@ -78,14 +78,14 @@ class BrowserSearcher:
 
             self.logger.debug("Library page loaded")
 
-            # Wait for main form to be available
-            if not self.browser.wait_for_selector("form#Form", timeout=10000):
-                self.logger.warning("Could not find main form, will try search inputs anyway")
+            # Wait for search input to be available
+            if not self.browser.wait_for_selector("input[placeholder='Ihre Suche']", timeout=5000):
+                self.logger.warning("Could not find search input, will continue anyway")
 
-            # The library uses ASP.NET form with search inputs
-            # Inputs have placeholder "Ihre Suche" or "Suche"
-            # We'll fill the first search input field
-            search_input_selector = "input[placeholder*='Suche']"
+            # The library uses search inputs with placeholder "Ihre Suche"
+            # Search button has class "app-minitools-search-btn"
+            # We'll fill the first visible search input field
+            search_input_selector = "input[placeholder='Ihre Suche']"
 
             # Fill search input
             if not self.browser.fill_form(search_input_selector, query):
@@ -95,16 +95,15 @@ class BrowserSearcher:
                 self.logger.debug(f"Filled search input with '{query}'")
 
                 # Wait a bit for form to react
-                time.sleep(0.5)
+                time.sleep(0.3)
 
-                # Try to click search button
-                # The library has multiple buttons with text "Suche"
-                search_button_selector = "button:has-text('Suche')"
+                # Click the search button with class "app-minitools-search-btn"
+                search_button_selector = "button.app-minitools-search-btn"
                 if self.browser.click(search_button_selector):
                     self.logger.debug("Clicked search button")
 
-                    # Wait for results to load
-                    time.sleep(1)  # Wait for AJAX to complete
+                    # Wait for page navigation and results to load
+                    time.sleep(1)  # Wait for navigation to complete
 
             # Get the HTML after search (with results)
             html = self.browser.get_html()
