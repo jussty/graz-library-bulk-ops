@@ -14,7 +14,7 @@ class Book:
     isbn: Optional[str] = None
     publisher: Optional[str] = None
     publication_year: Optional[int] = None
-    medium_type: str = "Book"  # Book, eBook, Audio, DVD, etc.
+    medium_type: str = "Book"  # Kinderbuch, eBook, Audio, DVD, etc.
     catalog_id: Optional[str] = None
     availability: str = "Unknown"  # Available, Checked Out, On Order
     location: Optional[str] = None
@@ -22,6 +22,14 @@ class Book:
     description: Optional[str] = None
     cover_url: Optional[str] = None
     url: Optional[str] = None
+    # Additional metadata fields from library detail pages
+    series: Optional[str] = None  # e.g., "Harry Potter, Panini Comics"
+    language: Optional[str] = None  # e.g., "Deutsch"
+    original_title: Optional[str] = None  # e.g., "Harry Potter: the wand collection"
+    page_count: Optional[int] = None  # e.g., 148
+    keywords: Optional[List[str]] = field(default_factory=list)  # Subject tags/keywords
+    barcode: Optional[str] = None  # Library barcode for copies
+    branch: Optional[str] = None  # Branch location (Zanklhof, Gösting, etc.)
 
     def __post_init__(self):
         """Validate book data"""
@@ -53,6 +61,13 @@ class Book:
             "description": self.description,
             "cover_url": self.cover_url,
             "url": self.url,
+            "series": self.series,
+            "language": self.language,
+            "original_title": self.original_title,
+            "page_count": self.page_count,
+            "keywords": self.keywords,
+            "barcode": self.barcode,
+            "branch": self.branch,
         }
 
 
