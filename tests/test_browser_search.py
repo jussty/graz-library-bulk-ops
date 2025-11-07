@@ -143,8 +143,8 @@ class TestBrowserSearcherErrorHandling:
         """Test that search handles exceptions gracefully"""
         searcher = BrowserSearcher()
 
-        # Mock browser to raise exception
-        searcher.browser.navigate = Mock(side_effect=Exception("Network error"))
+        # Mock browser start to fail
+        searcher.browser.start = Mock(return_value=False)
 
         # Should return None, not raise exception
         result = searcher.search("test")
