@@ -1,5 +1,5 @@
 """Session management - browser automation and authentication"""
 
-from .browser import BrowserSession
+from .browser import BrowserSession, SyncBrowserSession
 
-__all__ = ["BrowserSession"]
+__all__ = ["BrowserSession", "SyncBrowserSession"]
