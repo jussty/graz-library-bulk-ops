@@ -76,61 +76,75 @@ class BrowserSearcher:
                 self.logger.error("Failed to navigate to library")
                 return None
 
-            # Identify search form selectors (adjust based on actual HTML structure)
-            # These are placeholder selectors - may need adjustment
-            search_input_selector = "input[name='search'], input[placeholder*='Search'], input[id*='search']"
-            search_button_selector = "button[type='submit'], button[id*='search'], a[id*='search']"
+            self.logger.debug("Library page loaded")
 
-            # Try to find and fill search input
-            # This is a simplified approach - actual selectors depend on library's HTML
-            try:
-                # Wait for page to load
-                if not self.browser.wait_for_selector("form", timeout=10000):
-                    self.logger.warning("Could not find form on library page")
-                    return None
+            # Wait for main form to be available
+            if not self.browser.wait_for_selector("form#Form", timeout=10000):
+                self.logger.warning("Could not find main form, will try search inputs anyway")
 
-                # Get the actual HTML to inspect
-                html = self.browser.get_html()
-                if not html:
-                    self.logger.error("Could not get page HTML")
-                    return None
+            # The library uses ASP.NET form with search inputs
+            # Inputs have placeholder "Ihre Suche" or "Suche"
+            # We'll fill the first search input field
+            search_input_selector = "input[placeholder*='Suche']"
 
-                # Log some info about the page
-                self.logger.debug(f"Page HTML size: {len(html)} bytes")
+            # Fill search input
+            if not self.browser.fill_form(search_input_selector, query):
+                self.logger.warning(f"Could not fill search field with selector: {search_input_selector}")
+                # Continue anyway - try to get current page HTML
+            else:
+                self.logger.debug(f"Filled search input with '{query}'")
 
-                # Parse results from the current HTML
-                # (Results might already be on the page or loaded via AJAX)
-                books = self.parser.parse_search_results(html)
+                # Wait a bit for form to react
+                time.sleep(0.5)
 
-                # Create SearchResult
-                result = SearchResult(
-                    query=query,
-                    books=books,
-                    total_results=len(books),
-                    search_type=search_type,
-                )
+                # Try to click search button
+                # The library has multiple buttons with text "Suche"
+                search_button_selector = "button:has-text('Suche')"
+                if self.browser.click(search_button_selector):
+                    self.logger.debug("Clicked search button")
 
-                # Record search time
-                result.search_time_ms = (time.time() - start_time) * 1000
+                    # Wait for results to load
+                    time.sleep(1)  # Wait for AJAX to complete
 
-                self.logger.info(
-                    f"Found {result.total_results} results for '{query}' "
-                    f"({result.search_time_ms:.0f}ms)"
-                )
-
-                return result
-
-            except Exception as e:
-                self.logger.error(f"Error during browser search: {e}")
-                # Take screenshot for debugging
-                try:
-                    self.browser.screenshot(f"/tmp/library_error_{int(time.time())}.png")
-                except:
-                    pass
+            # Get the HTML after search (with results)
+            html = self.browser.get_html()
+            if not html:
+                self.logger.error("Could not get page HTML")
                 return None
 
+            # Log some info about the page
+            self.logger.debug(f"Page HTML size: {len(html)} bytes")
+
+            # Parse results from the rendered HTML
+            books = self.parser.parse_search_results(html)
+
+            # Create SearchResult
+            result = SearchResult(
+                query=query,
+                books=books,
+                total_results=len(books),
+                search_type=search_type,
+            )
+
+            # Record search time
+            result.search_time_ms = (time.time() - start_time) * 1000
+
+            self.logger.info(
+                f"Found {result.total_results} results for '{query}' "
+                f"({result.search_time_ms:.0f}ms)"
+            )
+
+            return result
+
         except Exception as e:
-            self.logger.error(f"Search failed: {e}")
+            self.logger.error(f"Search failed: {e}", exc_info=True)
+            # Take screenshot for debugging
+            try:
+                screenshot_path = f"/tmp/library_error_{int(time.time())}.png"
+                self.browser.screenshot(screenshot_path)
+                self.logger.info(f"Screenshot saved to {screenshot_path}")
+            except Exception as screenshot_err:
+                self.logger.warning(f"Could not save screenshot: {screenshot_err}")
             return None
 
     def close(self) -> None:
