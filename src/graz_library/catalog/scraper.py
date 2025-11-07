@@ -28,11 +28,12 @@ class WebOPACScraper:
             base_url: Base URL of the library website
         """
         self.base_url = base_url
-        self.search_url = f"{base_url}/Mediensuche/"
+        self.search_url = f"{base_url}/"  # DNN-based site uses POST to root
         self.parser = CatalogParser()
         self.logger = logger
         self.last_request_time = 0
         self.session = self._create_session()
+        self.viewstate = None  # ASP.NET ViewState for form submissions
 
     def _create_session(self) -> requests.Session:
         """Create a requests session with retry strategy
@@ -153,6 +154,40 @@ class WebOPACScraper:
         except Exception as e:
             self.logger.warning(f"Error saving to cache: {e}")
 
+    def _get_viewstate(self) -> Optional[dict]:
+        """Extract ASP.NET ViewState and other form values from the library page
+
+        Returns:
+            Dictionary with form values needed for POST, or None if failed
+        """
+        try:
+            from bs4 import BeautifulSoup
+
+            response = self.session.get(self.base_url, timeout=Config.REQUEST_TIMEOUT)
+            response.raise_for_status()
+
+            soup = BeautifulSoup(response.text, 'html.parser')
+            form = soup.find('form')
+
+            if not form:
+                self.logger.warning("Could not find form on library page")
+                return None
+
+            # Extract all hidden inputs and form fields
+            form_data = {}
+            for inp in form.find_all('input'):
+                name = inp.get('name')
+                value = inp.get('value', '')
+                if name:
+                    form_data[name] = value
+
+            self.logger.debug(f"Extracted {len(form_data)} form fields")
+            return form_data
+
+        except Exception as e:
+            self.logger.warning(f"Error extracting ViewState: {e}")
+            return None
+
     def search(
         self,
         query: str,
@@ -193,19 +228,27 @@ class WebOPACScraper:
             # Respect rate limiting
             self._respect_rate_limit()
 
-            # Build search parameters based on search type
-            params = {
-                "author": query if search_type == "author" else "",
-                "title": query if search_type == "title" else "",
-                "isbn": query if search_type == "isbn" else "",
-                "search": query if search_type == "keyword" else "",
-                "page": page,
-            }
+            # Get ViewState and form data (needed for ASP.NET forms)
+            form_data = self._get_viewstate()
+            if not form_data:
+                self.logger.error("Could not obtain form data from library page")
+                return None
 
-            # Make request
-            response = self.session.get(
+            # Build search parameters based on search type
+            # Add search query to form data
+            if search_type == "title":
+                form_data["title"] = query
+            elif search_type == "author":
+                form_data["author"] = query
+            elif search_type == "isbn":
+                form_data["isbn"] = query
+            else:  # keyword
+                form_data["search"] = query
+
+            # Make POST request (library uses ASP.NET forms)
+            response = self.session.post(
                 self.search_url,
-                params=params,
+                data=form_data,
                 timeout=Config.REQUEST_TIMEOUT,
             )
             response.raise_for_status()
