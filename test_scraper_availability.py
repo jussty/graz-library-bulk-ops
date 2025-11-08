@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Test script to search for books using scraper and display availability"""
+"""Test script to search for books in Graz library catalog and display local availability"""
 
 import sys
 from pathlib import Path
@@ -29,11 +29,11 @@ BOOKS = [
 
 
 def test_book_availability():
-    """Search for books and display availability"""
+    """Search for books in Graz library and display availability"""
     scraper = WebOPACScraper()
 
     print("\n" + "=" * 100)
-    print("BOOK AVAILABILITY REPORT (via Scraper)")
+    print("GRAZ LIBRARY - BOOK AVAILABILITY")
     print("=" * 100 + "\n")
 
     results = []
@@ -43,7 +43,7 @@ def test_book_availability():
 
         try:
             # Search for the book
-            search_result = scraper.search(title)
+            search_result = scraper.search(title, use_cache=False)
             if not search_result or not search_result.books:
                 print(f"  ✗ No search results")
                 results.append({
@@ -112,7 +112,7 @@ def test_book_availability():
     print("-" * 100)
     found_count = sum(1 for r in results if r["found"])
     available_count = sum(1 for r in results if r["availability"] == "Available")
-    print(f"\nTotal: {len(BOOKS)} | Found: {found_count} | Available: {available_count}")
+    print(f"\nTotal: {len(BOOKS)} | Found in Graz: {found_count} | Available: {available_count}")
     print("=" * 100 + "\n")
 
 
