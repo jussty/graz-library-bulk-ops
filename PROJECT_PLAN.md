@@ -6,39 +6,70 @@
 3. Handle batch operations from CSV/JSON files
 4. Provide a clean CLI interface
 
-## Phase 1: Project Foundation (Milestone: Initial Setup)
+## Phase 1: Project Foundation (Milestone: Initial Setup) ✅ COMPLETE
 - [x] Research library system and APIs
 - [x] Create project repository
 - [x] Set up git configuration
-- [ ] Create project structure
-- [ ] Initialize Python package structure
-- [ ] Create requirements.txt
-- [ ] Create setup.py
-- [ ] Create .gitignore
+- [x] Create project structure
+- [x] Initialize Python package structure
+- [x] Create requirements.txt
+- [x] Create setup.py
+- [x] Create .gitignore
 
-**Commit Message**: "chore: initialize project structure and configuration"
+**Status**: COMPLETE - All foundational infrastructure in place
+**Commits**:
+- "chore: initialize project structure and configuration"
+- "docs: add book list and project documentation"
 
-## Phase 2: Core Infrastructure (Milestone: Scraper Ready)
-- [ ] Create data models (Book, Reservation, SearchResult)
-- [ ] Implement WebOPAC scraper base class
-- [ ] Create HTML parser utilities
-- [ ] Implement search functionality
-- [ ] Add logging and error handling
-- [ ] Write unit tests for scraper
+## Phase 2: Core Infrastructure (Milestone: Scraper Ready) ✅ COMPLETE
+- [x] Create data models (Book, Reservation, SearchResult)
+- [x] Implement WebOPAC scraper base class
+- [x] Create HTML parser utilities
+- [x] Implement search functionality
+- [x] Add logging and error handling
+- [x] Write unit tests for scraper
+- [x] Add external book search (Open Library, Google Books, WorldCat)
 
-**Commit Message**: "feat: implement WebOPAC scraper and search functionality"
+**Status**: COMPLETE - Full search infrastructure with HTML parsing and external verification
+**Key Implementations**:
+- WebOPACScraper: Direct GET requests to `/Mediensuche/Einfache-Suche?search=<query>`
+- Parser: CSS class discovery - uses `tosic-oclc-search-resultitem` with fallbacks
+- ExternalBookSearcher: Multi-source verification (Open Library, Google Books, WorldCat)
+- Test Results:
+  - 1/11 books from test list found in Graz library ("Die Schule der magischen Tiere" - 10 copies)
+  - 11/11 books verified to exist in world catalogs
+  - WorldCat links provided for interlibrary loan requests
 
-## Phase 3: Browser Automation (Milestone: Interactive Ops Ready)
-- [ ] Set up Selenium/Playwright browser automation
+**Commits**:
+- "feat: implement WebOPAC scraper and search functionality"
+- "feat: enhance HTML parser with browser automation and detail pages"
+- "fix: search scraper and parser for library's actual HTML structure"
+- "feat: add external book search to verify book existence across public catalogs"
+- "docs: enhance book search documentation with WorldCat links and external verification results"
+
+## Phase 3: Browser Automation (Milestone: Interactive Ops Ready) ⏳ IN PROGRESS
+- [x] Set up Playwright browser automation with Puppeteer MCP
 - [ ] Implement session management
 - [ ] Create login/authentication handler
 - [ ] Implement reservation workflow
 - [ ] Add rate limiting and respectful crawling
 - [ ] Write integration tests
 
+**Status**: IN PROGRESS - Browser automation framework tested and validated
+**Key Work Done**:
+- Evaluated and implemented Puppeteer MCP for browser automation
+- Tested navigation and screenshot capabilities
+- Discovered direct GET API pattern (more efficient than browser automation for search)
+- Browser automation reserved for JavaScript-heavy pages and interactive operations
+
+**Next Steps**:
+- Implement session management for authenticated operations
+- Build reservation workflow using browser automation
+- Add error handling and retry logic
+
 **Commit Message**: "feat: implement browser automation for reservations"
 
-## Phase 4: Mail Order Integration (Milestone: All Operations Complete)
+## Phase 4: Mail Order Integration (Milestone: All Operations Complete) ⏳ PENDING
 - [ ] Implement mail order form submission
 - [ ] Add email notification handling
 - [ ] Create mail order request builder
@@ -46,9 +77,12 @@
 - [ ] Add validation for mail orders
 - [ ] Write tests for mail order flow
 
+**Status**: PENDING - Ready to start after Phase 3 completes
+**Estimated Timeline**: 2-3 hours
+
 **Commit Message**: "feat: add mail order functionality and email integration"
 
-## Phase 5: CLI and Batch Operations (Milestone: CLI Complete)
+## Phase 5: CLI and Batch Operations (Milestone: CLI Complete) ⏳ PENDING
 - [ ] Create Click/Typer CLI framework
 - [ ] Implement search command
 - [ ] Implement reserve command
@@ -57,9 +91,12 @@
 - [ ] Add CSV/JSON import support
 - [ ] Create example files
 
+**Status**: PENDING - Ready to start after Phases 3-4 complete
+**Estimated Timeline**: 3-4 hours
+
 **Commit Message**: "feat: add CLI interface and batch operation support"
 
-## Phase 6: Documentation and Polish (Milestone: Release Ready)
+## Phase 6: Documentation and Polish (Milestone: Release Ready) ⏳ PENDING
 - [ ] Write API documentation
 - [ ] Create usage guide
 - [ ] Create setup guide
@@ -68,6 +105,9 @@
 - [ ] Add README sections for each command
 - [ ] Full test coverage (target: 80%+)
 - [ ] Add error handling and user-friendly messages
+
+**Status**: PENDING - Final phase after Phases 3-5 complete
+**Estimated Timeline**: 2-3 hours
 
 **Commit Message**: "docs: add comprehensive documentation and examples"
 
@@ -171,12 +211,33 @@
 | Rate limits exceeded | Medium | Implement delays, caching, batch request queuing |
 | Browser automation flakiness | Medium | Retry logic, explicit waits, screenshots on failure |
 
+## Progress Summary
+
+### Completed Work
+- **Phase 1**: COMPLETE (Project foundation, git, package structure)
+- **Phase 2**: COMPLETE (Full search infrastructure, HTML parsing, external verification)
+  - WebOPACScraper with direct GET API discovery
+  - HTML parser with CSS class detection and fallbacks
+  - ExternalBookSearcher with multi-source verification
+  - Test results: 1/11 books in Graz, 11/11 verified globally
+
+### In Progress
+- **Phase 3**: IN PROGRESS (Browser automation setup)
+  - Puppeteer MCP framework tested and working
+  - Direct GET pattern discovered (more efficient for search)
+  - Ready for authenticated operations and reservations
+
+### Pending
+- **Phase 4**: Mail order integration (2-3 hours)
+- **Phase 5**: CLI interface (3-4 hours)
+- **Phase 6**: Final documentation (2-3 hours)
+
 ## Timeline Estimate
 - Phase 1: 1 hour (completed)
-- Phase 2: 4-6 hours
-- Phase 3: 4-6 hours
-- Phase 4: 2-3 hours
-- Phase 5: 3-4 hours
-- Phase 6: 2-3 hours
+- Phase 2: 6-8 hours (completed)
+- Phase 3: 3-4 hours (in progress)
+- Phase 4: 2-3 hours (pending)
+- Phase 5: 3-4 hours (pending)
+- Phase 6: 2-3 hours (pending)
 
-**Total: 16-23 hours of development**
+**Total: 17-25 hours of development** (7-8 hours completed, 8-14 hours remaining)

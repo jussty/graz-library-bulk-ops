@@ -1,5 +1,7 @@
 # Graz Library Bulk Operations Tool
 
+⚠️ **Work in Progress (WIP)** - This project is under active development. Features and APIs may change.
+
 A comprehensive Python tool for automating book search, reservations, and mail orders at Stadtbibliothek Graz (Graz City Library).
 
 ## Project Overview
@@ -10,6 +12,29 @@ This tool provides a command-line interface for bulk operations at Austria's Sta
 - **Bulk Reservations**: Reserve multiple books at once
 - **Mail Order Integration**: Submit bulk mail orders for in-person pickup or delivery
 - **Batch Operations**: Process lists of books from CSV/JSON files
+- **External Verification**: Verify book existence in world catalogs (Open Library, Google Books, WorldCat)
+
+## Current Status
+
+### Completed ✅
+- Book search functionality with WebOPAC scraper
+- HTML parser with CSS class detection and fallbacks
+- External book search via Open Library, Google Books, and WorldCat
+- Test infrastructure for local and external verification
+- **Test Results**: 1/11 test books in Graz library, 11/11 verified in world catalogs
+
+### In Progress ⏳
+- Browser automation framework setup (Puppeteer)
+- Session management for authenticated operations
+
+### Planned 📋
+- Reservation workflow
+- Mail order integration
+- CLI interface
+- Batch operations support
+- Documentation and examples
+
+See [PROJECT_PLAN.md](PROJECT_PLAN.md) for detailed roadmap and current progress.
 
 ## Research Summary
 
