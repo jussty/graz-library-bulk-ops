@@ -31,15 +31,15 @@ class CatalogParser:
         try:
             soup = BeautifulSoup(html, "html.parser")
 
-            # Find all result items (this will depend on actual WebOPAC structure)
-            # Placeholder selector - needs to be adjusted based on actual HTML
-            result_items = soup.find_all("div", class_=["result-item", "hit"])
+            # Find all result items - Stadtbibliothek Graz uses tosic-oclc-search-resultitem class
+            result_items = soup.find_all("div", class_="tosic-oclc-search-resultitem")
 
             if not result_items:
                 self.logger.debug(
-                    "No result items found - checking alternative selectors"
+                    "No result items found with tosic-oclc-search-resultitem - checking alternative selectors"
                 )
-                result_items = soup.find_all("div", class_="result")
+                # Fallback to alternative patterns in case structure changes
+                result_items = soup.find_all("div", class_=["result-item", "hit", "result"])
 
             for item in result_items:
                 try:
@@ -68,7 +68,17 @@ class CatalogParser:
         """
         try:
             # Extract title (usually in a link or heading)
-            title_elem = item.find(["h2", "h3", "a"], class_=["title", "hit-title"])
+            # First try to find h2 or h3 with specific classes
+            title_elem = item.find(["h2", "h3"], class_=["title", "hit-title"])
+
+            # If not found, try any h2/h3 or link
+            if not title_elem:
+                title_elem = item.find(["h2", "h3"])
+
+            # If still not found, try first link
+            if not title_elem:
+                title_elem = item.find("a", href=re.compile(r".*"))
+
             title = title_elem.get_text(strip=True) if title_elem else None
 
             if not title:

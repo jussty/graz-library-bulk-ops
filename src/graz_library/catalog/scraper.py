@@ -228,27 +228,24 @@ class WebOPACScraper:
             # Respect rate limiting
             self._respect_rate_limit()
 
-            # Get ViewState and form data (needed for ASP.NET forms)
-            form_data = self._get_viewstate()
-            if not form_data:
-                self.logger.error("Could not obtain form data from library page")
-                return None
+            # Build search URL based on search type
+            # The library uses direct URLs for searches: /Mediensuche/Einfache-Suche?search=...
+            search_endpoint = f"{self.base_url}/Mediensuche/Einfache-Suche"
 
-            # Build search parameters based on search type
-            # Add search query to form data
             if search_type == "title":
-                form_data["title"] = query
+                search_url = f"{search_endpoint}?title={query}"
             elif search_type == "author":
-                form_data["author"] = query
+                search_url = f"{search_endpoint}?author={query}"
             elif search_type == "isbn":
-                form_data["isbn"] = query
-            else:  # keyword
-                form_data["search"] = query
+                search_url = f"{search_endpoint}?isbn={query}"
+            else:  # keyword (default)
+                search_url = f"{search_endpoint}?search={query}"
 
-            # Make POST request (library uses ASP.NET forms)
-            response = self.session.post(
-                self.search_url,
-                data=form_data,
+            self.logger.debug(f"Search URL: {search_url}")
+
+            # Make GET request to search page
+            response = self.session.get(
+                search_url,
                 timeout=Config.REQUEST_TIMEOUT,
             )
             response.raise_for_status()
