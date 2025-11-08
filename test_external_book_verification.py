@@ -54,10 +54,14 @@ def verify_books_external():
                     print(f"    Author: {first_result.get('author', 'N/A')}")
                 if first_result.get('isbn') not in [None, 'N/A', '']:
                     print(f"    ISBN: {first_result.get('isbn', 'N/A')}")
+                else:
+                    print(f"    ISBN: N/A")
                 if first_result.get('published') not in [None, 'N/A', '']:
                     print(f"    Published: {first_result.get('published', 'N/A')}")
                 if first_result.get('pages') not in [None, 'N/A', '']:
                     print(f"    Pages: {first_result.get('pages', 'N/A')}")
+                if first_result.get('url'):
+                    print(f"    More Info: {first_result.get('url', 'N/A')[:70]}...")
 
                 results.append({
                     "title": title,
